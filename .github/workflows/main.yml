@@ -3,7 +3,7 @@ name: CI/CD for HTML Page
 on:
   push:
     branches:
-      - main
+      - main  # Ensure this matches your branch name
 
 jobs:
   # Build Job
@@ -13,30 +13,31 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Install Dependencies
-        run: |
-          # Assuming you don't have any dependencies for a basic HTML page, we can skip this step.
-
-      - name: Upload artifact to enable deployment
+      - name: Upload HTML Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: html-file
+          name: html-files
           path: |
-            ./index.html
+            index.html  # Ensure index.html is in the root directory
 
   # Deploy Job
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Required for deployment to GitHub Pages
     steps:
-      - name: Download artifact
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Download HTML Artifact
         uses: actions/download-artifact@v3
         with:
-          name: html-file
-          path: ./html
+          name: html-files
+          path: ./public
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.DPPP }}  # Use the default GitHub token for authentication
-          publish_dir: ./html
+          github_token: ${{ secrets.dppp }}  # Default GitHub token for authentication
+          publish_dir: ./public  # Ensure this matches the downloaded artifact path
